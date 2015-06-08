@@ -58,7 +58,7 @@ if( !isset($_GET["token"]) || Config::getCustomAuthSecret() != "".$_GET["token"]
 
 $message = parse_request( file_get_contents('php://input') );
 if ( $message != "" )  {
-	$url = "https://api.hipchat.com/v2/room/".Config::getHipChatRoomId."/notification?auth_token=".Config::getHipChatAuthToken;
+	$url = "https://api.hipchat.com/v2/room/".Config::getHipChatRoomId()."/notification?auth_token=".Config::getHipChatAuthToken();
 	$curlClient = new Curl();
 	$response = (new Browser($curlClient))->post(
 	    $url, 
