@@ -1,13 +1,9 @@
 <?php
 require 'vendor/autoload.php';
-require 'Config.php';
+require 'globals.php';
 
 use Buzz\Browser;
 use Buzz\Client\Curl;
-
-function parse_inifile() {
-	Config::load_config("config.ini");	
-}
 
 /* 
   Make a URL small
@@ -36,8 +32,8 @@ function parse_request($request = NULL) {
 		$dateStart = $response['build']['started_at'];
 		$dateEnd   = $response['build']['finished_at'];
 		$elapsed = abs(strtotime($dateEnd) - strtotime($dateStart));
-		if(Config::UseBitly() )
-			$buildURL =  make_bitly_url($response['build']['web_url'], Config::getBitlyLogin(), Config::getBitlyAppKey(), 'json'); 
+		if( USE_BITLY )
+			$buildURL =  make_bitly_url($response['build']['web_url'], BITLY_LOGIN, BITLY_APP_KEY, 'json'); 
 		else
 			$buildURL = $response['build']['web_url'];
 
@@ -50,15 +46,13 @@ function parse_request($request = NULL) {
 	return $responseMessage;
 }
 
-parse_inifile();
-
-if( !isset($_GET["token"]) || Config::getCustomAuthSecret() != "".$_GET["token"] ) {
+if( !isset($_GET["token"]) || CUSTOM_AUTH_SECRET != "".$_GET["token"] ) {
 	return;
 }
 
 $message = parse_request( file_get_contents('php://input') );
 if ( $message != "" )  {
-	$url = "https://api.hipchat.com/v2/room/".Config::getHipChatRoomId()."/notification?auth_token=".Config::getHipChatAuthToken();
+	$url = "https://api.hipchat.com/v2/room/".HIPCHAT_ROOM_ID."/notification?auth_token=".HIPCHAT_AUTH_TOKEN;
 	$curlClient = new Curl();
 	$response = (new Browser($curlClient))->post(
 	    $url, 
